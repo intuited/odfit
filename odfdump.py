@@ -11,6 +11,9 @@ from functools import partial
 import logging
 from sys import stderr
 
+
+# logging
+
 def make_logger(name, level=logging.DEBUG, strm=stderr):
     import logging
     logger = logging.getLogger(name)
@@ -21,6 +24,8 @@ def make_logger(name, level=logging.DEBUG, strm=stderr):
 warnings = make_logger('warnings')
 
 
+# Filetype detection
+
 def is_in_charset(string, charset='ascii'):
     try:
         string.decode(charset)
@@ -29,7 +34,6 @@ def is_in_charset(string, charset='ascii'):
     return True
 
 is_utf8 = partial(is_in_charset, charset='utf-8')
-
 
 class FiletypeDetector(object):
     """Scans into a file to determine its nature.
@@ -68,6 +72,8 @@ class FiletypeDetector(object):
         return 'utf-8'
 
 
+# XML Processing
+
 class XMLParseError(Exception):
     pass
 
@@ -85,6 +91,9 @@ def is_xml(archive, info):
     """Indicates if the file in ``archive`` identified by ``info`` is XML."""
     return info.filename.endswith('.xml')
 
+
+# metadata generation and formatting
+
 def format_header(info, content):
     """Format ``content`` as a header for the file identified by ``info``.
 
@@ -92,7 +101,6 @@ def format_header(info, content):
     """
     assert content.find('\n') == -1
     return '{0}:  {1}'.format(info.filename, content)
-
 
 def progressive_hash(hash_, file_, chunk_size=1048576):
     """Updates ``hash_`` with reads from ``file_``."""
@@ -102,13 +110,11 @@ def progressive_hash(hash_, file_, chunk_size=1048576):
             return hash_.hexdigest()
         hash_.update(chunk)
 
-
 def sha1_hash(info, member):
     """Returns a (name, hash) pair: ``name`` identifies the algorithm."""
     from hashlib import sha1
     member.seek(0)
     return ('sha1', progressive_hash(sha1(), member))
-
 
 def iterate_metadata(info, member, hash_=sha1_hash):
     """Yields (name, value) tuples of metadata information."""
@@ -131,10 +137,16 @@ def format_metadata(pair):
     joined_lines = (s.replace('\n', '  ') for s in strings)
     return '{0}: {1}'.format(*joined_lines)
 
+
+# content formatting
+
 def format_content(info, line):
     """Formats a line of content for dumping."""
     assert line.find('\n') == -1
     return '{0}:: {1}'.format(info.filename, line)
+
+
+# dumping of each archive member
 
 # Written for use in `detail` to allow a common interface between
 # tidied XML files and other files.
@@ -213,6 +225,8 @@ def detail(archive, info,
                 yield format_content(info, line.rstrip('\n'))
 
 
+# dumping entire archive
+
 def archive_details(filename, options=object()):
     """Yields annotated lines of files and/or metadata from the archive."""
     from zipfile import ZipFile
@@ -225,6 +239,8 @@ def archive_details(filename, options=object()):
             for line in file_detail:
                 yield line
         
+
+# do it!
 
 def main():
     import argparse
