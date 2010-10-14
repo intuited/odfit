@@ -8,6 +8,17 @@ Normalizes xml files by parsing and dumping them with ``lxml.etree``.
 Normalizes non-utf-8 files by converting them to that encoding.
 """
 from functools import partial
+import logging
+from sys import stderr
+
+def make_logger(name, level=logging.DEBUG, strm=stderr):
+    import logging
+    logger = logging.getLogger(name)
+    handler = logging.StreamHandler(strm=stderr)
+    logger.addHandler(handler)
+    logger.handler = handler
+    return logger
+warnings = make_logger('warnings')
 
 
 ##~~
@@ -61,11 +72,18 @@ class FiletypeDetector(object):
         return 'utf-8'
 
 
+class XMLParseError(Exception):
+    pass
+
 def tidy_xml(xml_file):
     """Returns a tidied version of the xml in ``xml_file``."""
     from lxml import etree
-    tree = etree.parse(xml_file)
-    return etree.tostring(tree, pretty_print=True)
+    try:
+        tree = etree.parse(xml_file)
+        return etree.tostring(tree, pretty_print=True)
+    except etree.XMLSyntaxError as e:
+        raise XMLParseError("lxml.etree.parse reported parse error '{0}'"
+                            .format(e))
 
 def is_xml(archive, info):
     """Indicates if the file in ``archive`` identified by ``info`` is XML."""
@@ -179,9 +197,14 @@ def detail(archive, info,
         for md in iterate_metadata(info, member):
             yield format_header(info, format_metadata(md))
 
-        if is_xml(archive, info):
+        if is_xml(archive, info) and info.file_size > 2:
             member.seek(0)
-            member = StringIO(tidy_xml(member))
+            try:
+                member = StringIO(tidy_xml(member))
+            except XMLParseError as e:
+                warnings.warning("Error parsing XML in member '{0}': {1}; "
+                                 "XML tidying aborted."
+                                 .format(info.filename, e))
 
         member.seek(0)
         filetype = FiletypeDetector()(member)
