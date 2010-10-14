@@ -21,10 +21,6 @@ def make_logger(name, level=logging.DEBUG, strm=stderr):
 warnings = make_logger('warnings')
 
 
-##~~
-from deboogie import tracewrap, stdout_log
-
-
 def is_in_charset(string, charset='ascii'):
     try:
         string.decode(charset)
