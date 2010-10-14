@@ -149,7 +149,7 @@ def format_content(info, line):
 # dumping of each archive member
 
 # Written for use in `detail` to allow a common interface between
-# tidied XML files and other files.
+# tidied XML files (as StringIO instances) and other files.
 class ResettableZipEntry(object):
     """Adds ``seek(0)`` to the ZipExtFile API.
     
