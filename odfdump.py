@@ -95,7 +95,7 @@ def format_header(info, content):
     ``content`` must not contain any newlines.
     """
     assert content.find('\n') == -1
-    return '{0}:: {1}'.format(info.filename, content)
+    return '{0}:  {1}'.format(info.filename, content)
 
 
 def progressive_hash(hash_, file_, chunk_size=1048576):
@@ -138,7 +138,7 @@ def format_metadata(pair):
 def format_content(info, line):
     """Formats a line of content for dumping."""
     assert line.find('\n') == -1
-    return '{0}:  {1}'.format(info.filename, line)
+    return '{0}:: {1}'.format(info.filename, line)
 
 # Written for use in `detail` to allow a common interface between
 # tidied XML files and other files.
@@ -208,6 +208,8 @@ def detail(archive, info,
 
         member.seek(0)
         filetype = FiletypeDetector()(member)
+
+        yield format_header(info, format_metadata(('filetype', filetype)))
 
         if filetype == 'utf-8':
             member.seek(0)
