@@ -8,13 +8,33 @@ This differs from tools like `odt2txt`_ in that the output consists of
 the actual contents of the files within the ODF container
 rather than an textual representation of the document.
 
-.. _odt2txt: http://stosberg.net/odt2txt/
-
 This means that it presents a much more complete set of data,
 including macros, formatting, and other details.
 
 Information on binary files is limited to metadata
 and hashes, including a SHA1 checksum.
+
+.. _odt2txt: http://stosberg.net/odt2txt/
+
+
+SETUP
+-----
+
+The ``odfdump`` script can make do with
+the standard library's complement of modules.
+
+It will attempt to make use of the `lxml`_ module
+for XML pretty-printing,
+but will fall back to standard library modules if that is unavailable.
+
+So it should be possible to use ``odfdump`` with any Python 2.6 or later.
+
+Earlier Pythons may work as well, but the script has not been tested with them.
+
+If ``lxml`` is available, XML processing will be faster (> 3x)
+and more robust in the face of incorrect or incomplete XML.
+
+.. _lxml: http://pypi.python.org/pypi/lxml
 
 
 USAGE
@@ -44,11 +64,11 @@ can be accomplished by
 More info (based on using `odt2txt`_ instead of ``odfdump``)
 is available from the `git wiki`_.
 
-.. _git: http://git-scm.com/
-.. _git wiki: https://git.wiki.kernel.org/index.php/GitTips#Instructions_for_Git_1.6.1_or_later
-
 ``odfdump`` is also suitable for use with other pkzip-formatted archives.
 See the note about `filetype detection`_ in `BUGS, ISSUES and WARNINGS`_.
+
+.. _git: http://git-scm.com/
+.. _git wiki: https://git.wiki.kernel.org/index.php/GitTips#Instructions_for_Git_1.6.1_or_later
 
 
 OUTPUT FORMAT
@@ -124,6 +144,11 @@ BUGS, ISSUES, and WARNINGS
 -   There are no plans to guarantee consistency between versions.
     So a dump created with an older version  of ``odfdump``
     shouldn't be compared with a dump created with a newer version.
+    Even with the same version of ``odfdump``, dumps of the same document
+    may differ because of different dependencies:
+    ``odfdump`` will use different XML packages depending on
+    what is locally installed.
+    The `lxml`_ module will be used if it is locally available.
 
 -   The output format is intended only for reading and comparison purposes.
     It is not intended to be a reversable translation of the original,
