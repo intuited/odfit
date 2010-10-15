@@ -116,12 +116,28 @@ def sha1_hash(info, member):
     member.seek(0)
     return ('sha1', progressive_hash(sha1(), member))
 
+class FormattedZipInfo(object):
+    """Proxies a ZipInfo object, providing formatted versions of its data."""
+    def __init__(self, info):
+        self._info = info
+    def __getattr__(self, attr):
+        return getattr(self._info, attr)
+    @property
+    def date_time(self):
+        return ('{0:02}-{1:02}-{2:02}T{3:02}:{4:02}:{5:02}'
+                .format(*self._info.date_time))
+
 def iterate_metadata(info, member, hash_=sha1_hash):
-    """Yields (name, value) tuples of metadata information."""
+    """Yields (name, value) tuples of formatted metadata information.
+
+    The attribs of the ``info`` object are filtered through a
+    FormattedZipInfo object.
+    """
     from functools import partial
     from itertools import chain
     info_items = ('date_time', 'comment', 'extra', 'file_size', 'CRC')
     drop_empties = frozenset(('comment', 'extra')).__contains__
+    info = FormattedZipInfo(info)
     get = partial(getattr, info)
     item_strings = ((attr, str(get(attr))) for attr in info_items)
     item_strings = chain(item_strings, (hash_(info, member),))
