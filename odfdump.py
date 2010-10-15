@@ -3,9 +3,7 @@
 
 This includes .odt's, .odb's, or really any file which is an archive.
 
-Normalizes xml files by parsing and dumping them with ``lxml.etree``.
-
-Normalizes non-utf-8 files by converting them to that encoding.
+Normalizes xml files by parsing and pretty-printing them.
 """
 # Licensed under the FreeBSD license.
 # See the file COPYING for details.
@@ -262,8 +260,12 @@ def detail(archive, info,
 
 # dumping entire archive
 
-def archive_details(filename, options=object()):
-    """Yields annotated lines of files and/or metadata from the archive."""
+def archive_details(filename, detail=detail):
+    """Yields annotated lines of files and/or metadata from the archive.
+
+    The function argument ``detail`` can be provided
+    to customize formatting of archive members.
+    """
     from zipfile import ZipFile
     from itertools import chain
     from contextlib import closing
@@ -273,20 +275,37 @@ def archive_details(filename, options=object()):
         for file_detail in details:
             for line in file_detail:
                 yield line
-        
+
 
 # do it!
 
 def main():
-    import argparse
-    parser = argparse.ArgumentParser(
-        description=__doc__
-        )
-    parser.add_argument('filename')
-    options = parser.parse_args()
-    if hasattr(options, 'filename'):
-        for line in archive_details(options.filename, options):
-            print line
+    # Try to use argparse: it gives a nicer summary.
+    try:
+        import argparse
+    except ImportError:
+        import optparse
+        parser = optparse.OptionParser(
+            "usage: %prog [-h] FILENAME",
+            description=__doc__
+            )
+        (_, args) = parser.parse_args()
+        if len(args) != 1:
+            parser.error("Filename argument must be given as the only argument.")
+        filename = args[0]
+    else:
+        parser = argparse.ArgumentParser(
+            description=__doc__
+            )
+        parser.add_argument('filename',
+            help="The filename of an OpenDocument Format file to dump."
+            )
+        args = parser.parse_args()
+        filename = args.filename
+
+    lines = archive_details(filename)
+    for line in lines:
+        print line
 
 if __name__ == '__main__':
     exit(main())
