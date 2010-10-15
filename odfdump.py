@@ -165,7 +165,7 @@ def iterate_metadata(info, member, hash_=sha1_hash):
 
 def format_metadata(pair):
     """Formats a (name, value) pair as a string for header inclusion.
-    
+
     Any newlines in ``name`` or ``value`` are replaced with two spaces.
     """
     strings = (str(element) for element in pair)
@@ -187,7 +187,7 @@ def format_content(info, line):
 # tidied XML files (as StringIO instances) and other files.
 class ResettableZipEntry(object):
     """Adds ``seek(0)`` to the ZipExtFile API.
-    
+
     Call ``ResettableZipEntry(archive, info)``
     instead of ``archive.open(info)``.
     """
