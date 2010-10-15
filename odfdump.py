@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Creates dumps of files in OpenDocument Format.
+"""Creates textual dumps of OpenDocument Format files and other zip archives.
 
 This includes .odt's, .odb's, or really any file which is an archive.
 
@@ -7,6 +7,9 @@ Normalizes xml files by parsing and dumping them with ``lxml.etree``.
 
 Normalizes non-utf-8 files by converting them to that encoding.
 """
+# Licensed under the FreeBSD license.
+# See the file COPYING for details.
+
 from functools import partial
 import logging
 from sys import stderr
