@@ -78,17 +78,33 @@ class FiletypeDetector(object):
 # XML Processing
 
 class XMLParseError(Exception):
+    """Raised in response to errors when parsing an archived XML file."""
     pass
 
 def tidy_xml(xml_file):
-    """Returns a tidied version of the xml in ``xml_file``."""
-    from lxml import etree
+    """Returns a tidied version of the xml in ``xml_file``.
+
+    Prefers ``lxml.etree`` for speed and robustitude;
+    falls back to ``xml.etree.ElementTree``.
+    """
     try:
-        tree = etree.parse(xml_file)
-        return etree.tostring(tree, pretty_print=True)
-    except etree.XMLSyntaxError as e:
-        raise XMLParseError("lxml.etree.parse reported parse error '{0}'"
+        from lxml.etree import parse, tostring
+        from functools import partial
+        pretty_print = partial(tostring, pretty_print=True)
+    except ImportError:
+        from xml.dom.minidom import parse
+        from operator import methodcaller
+        pretty_print = methodcaller('toprettyxml', indent='  ')
+    try:
+        tree = parse(xml_file)
+    except Exception as e:
+        # The xml libraries don't make it clear
+        # what exceptions their ``parse`` functions raise,
+        # so we catch everything.
+        # TODO: re-raise anything that's related to the underlying file.
+        raise XMLParseError("XML parse routine raised error '{0}'"
                             .format(e))
+    return pretty_print(tree)
 
 def is_xml(archive, info):
     """Indicates if the file in ``archive`` identified by ``info`` is XML."""
