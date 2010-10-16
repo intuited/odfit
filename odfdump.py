@@ -144,7 +144,11 @@ class FormattedZipInfo(object):
         return ('{0:02}-{1:02}-{2:02}T{3:02}:{4:02}:{5:02}'
                 .format(*self._info.date_time))
 
-def iterate_metadata(info, member, hash_=sha1_hash):
+metadata_items = set(('date_time', 'comment', 'extra', 'file_size', 'CRC'))
+
+def iterate_metadata(info, member,
+                     metadata_items=metadata_items,
+                     hash_=sha1_hash):
     """Yields (name, value) tuples of formatted metadata information.
 
     The attribs of the ``info`` object are filtered through a
@@ -152,11 +156,10 @@ def iterate_metadata(info, member, hash_=sha1_hash):
     """
     from functools import partial
     from itertools import chain
-    info_items = ('date_time', 'comment', 'extra', 'file_size', 'CRC')
     drop_empties = frozenset(('comment', 'extra')).__contains__
     info = FormattedZipInfo(info)
     get = partial(getattr, info)
-    item_strings = ((attr, str(get(attr))) for attr in info_items)
+    item_strings = ((attr, str(get(attr))) for attr in metadata_items)
     item_strings = chain(item_strings, (hash_(info, member),))
     return (pair for pair in item_strings
                  if pair[1] or not drop_empties(pair[0]))
@@ -280,30 +283,36 @@ def archive_details(filename, detail=detail):
 # do it!
 
 def main():
-    # Try to use argparse: it gives a nicer summary.
-    try:
-        import argparse
-    except ImportError:
-        import optparse
-        parser = optparse.OptionParser(
-            "usage: %prog [-h] FILENAME",
-            description=__doc__
-            )
-        (_, args) = parser.parse_args()
-        if len(args) != 1:
-            parser.error("Filename argument must be given as the only argument.")
-        filename = args[0]
-    else:
-        parser = argparse.ArgumentParser(
-            description=__doc__
-            )
-        parser.add_argument('filename',
-            help="The filename of an OpenDocument Format file to dump."
-            )
-        args = parser.parse_args()
-        filename = args.filename
+    import optparse
+    from functools import partial
 
-    lines = archive_details(filename)
+    parser = optparse.OptionParser(
+        "usage: %prog [-h] FILENAME",
+        description=__doc__
+        )
+    parser.add_option('-D', '--no-dump-date',
+        help="Do not dump the date of each archive member.",
+        action='append_const',
+        const='date_time',
+        dest='nodump',
+        default=[],
+        )
+
+    opts, args = parser.parse_args()
+
+    if len(args) != 1:
+        parser.error("The document FILENAME"
+                     " must be given as the only argument.")
+    filename = args[0]
+
+    iterate_metadata_nodump = partial(iterate_metadata,
+                                      metadata_items=(metadata_items
+                                                      - set(opts.nodump)))
+
+    detail_nodump = partial(detail, iterate_metadata=iterate_metadata_nodump)
+
+    lines = archive_details(filename, detail=detail_nodump)
+
     for line in lines:
         print line
 
