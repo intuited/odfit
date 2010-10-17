@@ -3,7 +3,7 @@
 
 This includes .odt's, .odb's, or really any file which is an archive.
 
-Normalizes xml files by parsing and pretty-printing them.
+Normalizes XML files by parsing and pretty-printing them.
 """
 # Licensed under the FreeBSD license.
 # See the file COPYING for details.

@@ -38,7 +38,8 @@ setup(
     author_email = "intuited@gmail.com",
     url = "http://github.com/intuited/odfit",
     description = format_desc("""
-        Creates textual dumps of OpenDocument Format files and other zip archives.
+        Produces textual information based on the contents of
+        OpenDocument Format files and other archives.
         """),
     long_description = file_contents('README.txt'),
     classifiers = format_classifiers("""
@@ -51,6 +52,8 @@ setup(
         Topic :: Software Development :: Libraries :: Python Modules
         Topic :: Utilities
         Topic :: System :: Archiving
+        Topic :: Office/Business
+        Topic :: Software Development :: Version Control
         """),
     keywords = split_keywords("""
         xml opendocument odt ods odb odp openoffice
