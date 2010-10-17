@@ -25,9 +25,11 @@ the standard library's complement of modules.
 
 It will attempt to make use of the `lxml`_ module
 for XML pretty-printing,
-but will fall back to standard library modules if that is unavailable.
+but will fall back to standard library modules if it is unavailable.
 
-So it should be possible to use ``odfdump`` with any Python 2.6 or later.
+So it should be possible to use ``odfdump`` with any Python 2.6 or later,
+without requiring installation,
+allowing it to be distributed with source repos with some reliability.
 
 Earlier Pythons may work as well, but the script has not been tested with them.
 
@@ -184,6 +186,13 @@ BUGS, ISSUES, and WARNINGS
     the dump is done in archive file order.
     This means that comparison of dumps of identical documents
     may end up showing significant differences.
+
+-   There are many performance optimizations which could be put in place,
+    particularly if the script were to be reworked as a diff routine.
+    Having knowledge of both of the compared documents would allow
+    ``odfdump`` to, for example, only output XML for files which have changed.
+    It's also very unlikely that a SHA-1 comparison
+    will detect changes that a CRC-32 comparison does not.
 
 
 LICENSE
