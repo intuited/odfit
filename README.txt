@@ -40,15 +40,25 @@ for XML pretty-printing,
 but will fall back to standard library modules if necessary.
 
 So it should be possible to use ``odfit`` with any Python 2.6 or later,
-without requiring installation,
-allowing it to be distributed with source repos with some reliability.
+without requiring installation.
 
-Earlier Pythons may work as well, but the script has not been tested with them.
+This means that the executable module file ``odfit.py``
+can be distributed with source repos with some reliability.
+
+Pythons older than 2.6 may also work,
+but the script has not been tested with them.
 
 If ``lxml`` is available, XML processing will be faster (> 3x)
 and more robust when dealing with incorrect or incomplete XML.
 
+In addition to running the script ``odfit.py`` directly,
+the module can be installed from source
+or via `PyPI`_.
+This will cause an equivalent script to be installed system-wide,
+enabling the command ``odfit`` on the system path.
+
 .. _lxml: http://pypi.python.org/pypi/lxml
+.. _PyPI: http://pypi.python.org/pypi/odfit
 
 
 USAGE
