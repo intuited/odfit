@@ -1,7 +1,6 @@
 # Require setuptools for script installation
 try:
     from setuptools import setup
-    raise ImportError
 except ImportError:
     from sys import stderr
     print >> stderr, (
@@ -59,7 +58,7 @@ setup(
         xml opendocument odt ods odb odp openoffice
         archive zip dump diff compare
         """),
-    py_modules = ['odfit']
+    py_modules = ['odfit'],
     entry_points = {
         'console_scripts': ['odfit = odfit:main']
         },
