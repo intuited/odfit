@@ -32,11 +32,11 @@ def file_contents(filename):
         return f.read()
 
 setup(
-    name = "odfdump",
+    name = "odfit",
     version = "0.6",
     author = "Ted Tibbetts",
     author_email = "intuited@gmail.com",
-    url = "http://github.com/intuited/odfdump",
+    url = "http://github.com/intuited/odfit",
     description = format_desc("""
         Creates textual dumps of OpenDocument Format files and other zip archives.
         """),
@@ -53,11 +53,11 @@ setup(
         Topic :: System :: Archiving
         """),
     keywords = split_keywords("""
-        xml opendocument odt ods odb odp openoffice archive zip dump diff
+        xml opendocument odt ods odb odp openoffice
+        archive zip dump diff compare
         """),
-    packages = ['odfdump'],
-    package_dir = {'odfdump': ''},
+    py_modules = ['odfit']
     entry_points = {
-        'console_scripts': ['odfdump = odfdump:main']
+        'console_scripts': ['odfit = odfit:main']
         },
     )
