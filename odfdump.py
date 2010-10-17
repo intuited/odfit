@@ -144,7 +144,9 @@ class FormattedZipInfo(object):
         return ('{0:02}-{1:02}-{2:02}T{3:02}:{4:02}:{5:02}'
                 .format(*self._info.date_time))
 
-metadata_items = set(('date_time', 'comment', 'extra', 'file_size', 'CRC'))
+# TODO: The sha1 and filetype should be part of this sequence.
+#       Actually this should be a class with interdependent properties
+metadata_items = ('date_time', 'comment', 'extra', 'file_size', 'CRC')
 
 def iterate_metadata(info, member,
                      metadata_items=metadata_items,
@@ -305,9 +307,9 @@ def main():
                      " must be given as the only argument.")
     filename = args[0]
 
+    md_items_to_dump = [i for i in metadata_items if not i in opts.nodump]
     iterate_metadata_nodump = partial(iterate_metadata,
-                                      metadata_items=(metadata_items
-                                                      - set(opts.nodump)))
+                                      metadata_items=md_items_to_dump)
 
     detail_nodump = partial(detail, iterate_metadata=iterate_metadata_nodump)
 
