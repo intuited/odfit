@@ -40,7 +40,8 @@ and more robust in the face of incorrect or incomplete XML.
 USAGE
 -----
 
-``odfdump`` is mostly intended for use with version control systems like `git`_.
+``odfdump`` is mostly intended for use with version control systems like `git`_,
+in order to identify changes between versions of OpenDocument Format files.
 
 For example, with git 1.6.1 or later,
 setting up a repo to use ``odfdump`` to produce diff input
@@ -50,7 +51,7 @@ can be accomplished by
     to set the ``textconv`` option for the ``odf`` driver name::
 
         [diff "odf"]
-            textconv=odfdump
+            textconv=odfdump -D
 
 -   associating the various ODF filetypes with the ``odf`` driver name
     by adding lines like the following to a ``.gitattributes`` file
@@ -67,6 +68,15 @@ is available from the `git wiki`_.
 ``odfdump`` is also suitable for use with other pkzip-formatted archives.
 See the note about `filetype detection`_ in `BUGS, ISSUES and WARNINGS`_.
 
+The ``-D`` option to ``odfdump`` instructs it
+to omit the timestamp of each archive member.
+OpenOffice seems to reset this timestamp for all members
+whenever it saves a new version of a document.
+Because of this, this piece of data is not meaningful
+and shouldn't normally be displayed as part of a diff.
+For this reason, I expect that ``-D`` should normally be passed
+when generating a dump for the purposes of diffing.
+
 .. _git: http://git-scm.com/
 .. _git wiki: https://git.wiki.kernel.org/index.php/GitTips#Instructions_for_Git_1.6.1_or_later
 
@@ -78,7 +88,7 @@ Metadata Header
 ^^^^^^^^^^^^^^^
 
 Output for each contained file will consist of a series of header lines
-prefixed with the member filename and two colons followed by a space, e.g.::
+prefixed with the member filename and a colon followed by two spaces, e.g.::
 
     path/to/member/file:: date_time: 2010-10-12T21:32:24
     path/to/member/file:: file_size: 42
@@ -99,16 +109,26 @@ The attributes which are dumped if present for a given archive member are:
 -   file_size
 -   CRC
 
+The ``date_time`` will only be output if the ``-D`` option
+has not been passed on the command line.
+
+After these attributes, two more header lines will be output,
+containing the member's SHA-1 hash and the detected filetype.
+The detected filetype will be either
+'binary', 'utf-8' (which subsumes ASCII), or 'unknown'.
+
+
 Content section
 ^^^^^^^^^^^^^^^
 
-After the header, printable files will have their content dumped.
+After the header, printable files (those whose filetype is 'utf-8')
+will have their content dumped.
 
 The output for the content section is similar to that used for the header section.
 
 Rather than name/value pairs, lines of the file are output.
 
-The delimiter between filename and content is a colon and two spaces.
+The delimiter between filename and content is two colons and a space.
 
 For example::
 
@@ -117,7 +137,7 @@ For example::
     path/to/member/file:  The third line of the file
 
 A file is assumed to be printable if it is not detected as binary.
-See the node on _`filetype detection` for more information.
+See _`filetype detection` for more information.
 
 XML Files
 ^^^^^^^^^
