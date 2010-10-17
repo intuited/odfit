@@ -1,13 +1,16 @@
+# Require setuptools for script installation
 try:
     from setuptools import setup
+    raise ImportError
 except ImportError:
     from sys import stderr
-    print ('Sorry, you must install the ``setuptools`` module'
-           ' in order to install this package.\n'
-           '``setuptools`` can be acquired with the command\n'
-           '    easy_install setuptools\n'
-           'or by download from http://pypi.python.org/pypi/setuptools'
-          ) >> stderr
+    print >> stderr, (
+        'Sorry, you must install the ``setuptools`` module'
+        ' in order to install this package.\n'
+        '``setuptools`` can be installed with the command\n'
+        '    easy_install setuptools\n'
+        'or by download from <http://pypi.python.org/pypi/setuptools>.\n'
+        )
     raise
 
 
