@@ -143,6 +143,8 @@ class FormattedZipInfo(object):
     def date_time(self):
         return ('{0:02}-{1:02}-{2:02}T{3:02}:{4:02}:{5:02}'
                 .format(*self._info.date_time))
+    def __dir__(self):
+        return dir(self._info)
 
 # TODO: The sha1 and filetype should be part of this sequence.
 #       Actually this should be a class with interdependent properties
