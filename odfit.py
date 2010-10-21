@@ -193,19 +193,47 @@ class ResettableZipEntry(object):
 
     Call ``ResettableZipEntry(archive, info)``
     instead of ``archive.open(info)``.
+
+    Also provides error handling for its read method
+    in case of corrupt zipfile members.
     """
     def __init__(self, archive, info):
         self._archive = archive
         self._info = info
         self._zef = archive.open(info)
+
     def seek(self, position):
+        """Reset the member by closing and reopening it from the archive."""
         if position != 0:
             raise ValueError("SeekableZipEntry only supports seeking"
                              " to position 0.")
         self._zef.close()
         self._zef = self._archive.open(self._info)
+
     def __iter__(self):
-        return iter(self._zef)
+        return self
+
+    def _error_wrap(self, f, *args, **kwargs):
+        """Call ``f`` with zlib error handling in place."""
+        from zlib import error
+        try:
+            return f(*args, **kwargs)
+        except error as e:
+            def indent(string):
+                return '\n'.join('    ' + line for line in string.split("\n"))
+            error_message = indent(str(e))
+            warnings.warning("zlib error for archive member '{0}':{1}"
+                             .format(self._info.filename, error_message))
+            return ''
+
+    # Error-wrapped methods.
+    def read(self, *args, **kwargs):
+        return self._error_wrap(self._zef.read, *args, **kwargs)
+    def next(self):
+        return self._error_wrap(self._zef.next)
+    def readline(self, *args, **kwargs):
+        return self._error_wrap(self._zef.readline, *args, **kwargs)
+
     def __getattr__(self, attr):
         return getattr(self._zef, attr)
 
