@@ -295,17 +295,23 @@ def detail(archive, info,
 
 # dumping entire archive
 
-def archive_details(filename, detail=detail):
+def archive_details(filename, detail=detail, sort_key=None):
     """Yields annotated lines of files and/or metadata from the archive.
 
-    The function argument ``detail`` can be provided
+    The function argument `detail` can be provided
     to customize formatting of archive members.
+
+    If `sort_key` is provided as a truthy value,
+    it will be passed as the `key` keyword argument
+    to sort the member info list.
     """
     from zipfile import ZipFile
     from itertools import chain
     from contextlib import closing
     with closing(ZipFile(filename, 'r')) as archive:
         infos = archive.infolist()
+        if sort_key:
+            infos.sort(key=sort_key)
         details = (detail(archive, info) for info in infos)
         for file_detail in details:
             for line in file_detail:
@@ -329,6 +335,12 @@ def main():
         dest='nodump',
         default=[],
         )
+    parser.add_option('-s', '--sort',
+        help="Sort the members by filename.",
+        action='store_const',
+        const=lambda info: info.filename,
+        default=None,
+        )
 
     opts, args = parser.parse_args()
 
@@ -343,10 +355,10 @@ def main():
 
     detail_nodump = partial(detail, iterate_metadata=iterate_metadata_nodump)
 
-    lines = archive_details(filename, detail=detail_nodump)
+    lines = archive_details(filename, detail=detail_nodump, sort_key=opts.sort)
 
     for line in lines:
-        print line
+       print line
 
 if __name__ == '__main__':
     exit(main())

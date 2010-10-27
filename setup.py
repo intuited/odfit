@@ -32,7 +32,7 @@ def file_contents(filename):
 
 setup(
     name = "odfit",
-    version = "0.6.1",
+    version = "0.6.2",
     author = "Ted Tibbetts",
     author_email = "intuited@gmail.com",
     url = "http://github.com/intuited/odfit",
