@@ -214,12 +214,9 @@ BUGS, ISSUES, and WARNINGS
     There will be additional ambiguities in dumps from files
     containing members with identical filenames.
 
--   I haven't yet checked to see if the order of members
-    of an odf file is stable.
-    ``odfit`` currently does not sort the members before outputting them:
-    member output is done in archive file order.
-    This means that comparison of dumps of equivalent documents
-    may end up showing significant differences.
+-   The order of members in an odf is not stable:
+    this is to say that it may change from save to save.
+    To ensure consistency, the ``--sort`` option should be used.
 
 -   There are many performance optimizations which could be put in place,
     particularly if the script were to be reworked as a diff routine.
